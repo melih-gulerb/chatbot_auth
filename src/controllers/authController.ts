@@ -1,6 +1,5 @@
 import {NextFunction, Request, Response} from 'express'
 import { AuthService } from '../services/authService'
-import {AuthResponse} from "../models/responses/authResponse";
 
 export class AuthController {
     private authService: AuthService
@@ -8,7 +7,7 @@ export class AuthController {
     constructor(authService: AuthService) {
         this.authService = authService
     }
-    public async authenticate(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async createJWT(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
             const { clientId, userId } = req.body
@@ -17,8 +16,21 @@ export class AuthController {
 
             res.status(200).json(token)
             return
-        } catch {
-            next()
+        } catch (err){
+            next(err)
+        }
+    }
+
+    public async verifyJWT(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const { token } = req.body
+            const isValid = await this.authService.verifyJWT(token)
+
+            res.status(200).json(isValid)
+            return
+        } catch (err) {
+            next(err)
         }
     }
 }

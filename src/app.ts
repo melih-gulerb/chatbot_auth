@@ -3,8 +3,8 @@ import dotenv from 'dotenv'
 import { getDBConnection } from './configs/mssql'
 import { AuthService } from './services/authService'
 import { AuthController } from './controllers/authController'
-import {AuthRepository} from "./repositories/authRepository";
-import {errorHandler} from "./middlewares/errorHandling";
+import {AuthRepository} from "./repositories/authRepository"
+import {errorHandler} from "./middlewares/errorHandling"
 
 dotenv.config()
 
@@ -21,8 +21,10 @@ export async function initialize() {
         const router = express.Router()
 
         app.use('/auth', router)
+        router.post('', (req, res, next) => authController.createJWT(req, res, next))
+        router.post('/verify', (req, res, next) => authController.verifyJWT(req, res, next))
+
         router.use(errorHandler)
-        router.post('', (req, res, next) => authController.authenticate(req, res, next))
 
         const PORT = 4040
         app.listen(PORT, () => {

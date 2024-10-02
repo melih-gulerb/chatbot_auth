@@ -1,6 +1,6 @@
 import sql, {ConnectionPool} from "mssql"
 import {BusinessError} from "../models/errors/base"
-import {ValidateUserSecretResponse} from "../models/repository/response";
+import {ValidateUserSecretResponse} from "../models/repository/response"
 
 export class AuthRepository {
     private static instance: AuthRepository | null = null
@@ -26,8 +26,8 @@ export class AuthRepository {
                 modelId: result.recordset[0] == null ? "" : result.recordset[0].modelId
             }
         } catch (error) {
-            console.error('Database query error:', error);
-            throw new BusinessError(error as string, 500);
+            console.error('Database query error:', error)
+            throw new BusinessError(error as string, 500)
         }
     }
 }
