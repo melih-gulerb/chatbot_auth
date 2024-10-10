@@ -8,14 +8,15 @@ import {AuthenticationController} from "./controllers/authenticationController";
 import {AuthenticationService} from "./services/authenticationService";
 import {AuthorizationRoutes} from "./routes/authorizationRoutes";
 import {AuthenticationRoutes} from "./routes/authenticationRoutes";
+import {errorHandler} from "./middlewares/errorHandling";
 
 dotenv.config()
 
-const app = express()
-app.use(express.json())
-
 export async function initialize() {
     try {
+        const app = express()
+        app.use(express.json())
+
         const mssqlConnection = await getDBConnection()
         const authRepository = AuthRepository.getInstance(mssqlConnection)
 
@@ -25,9 +26,11 @@ export async function initialize() {
         const authenticationService = new AuthenticationService(process.env.JWT_SECRET || '', '12h', authRepository)
         const authenticationController = new AuthenticationController(authenticationService)
 
-        new AuthorizationRoutes().InitRoutes(app, authorizationController)
-        new AuthenticationRoutes().InitRoutes(app, authenticationController)
+        app.post('/authentication/signup',authenticationController.signup)
+        app.post('/authentication/login',authenticationController.login)
+        app.post('/authorization/verify',authorizationController.verify)
 
+        app.use(errorHandler)
         const PORT = 4040
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`)

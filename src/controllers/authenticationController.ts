@@ -6,6 +6,8 @@ export class AuthenticationController {
 
     constructor(authService: AuthenticationService) {
         this.authService = authService;
+        this.signup = this.signup.bind(this);
+        this.login = this.login.bind(this);
     }
 
     public async signup(req: Request, res: Response, next: NextFunction): Promise<void> {

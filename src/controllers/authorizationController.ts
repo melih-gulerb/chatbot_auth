@@ -6,6 +6,7 @@ export class AuthorizationController {
 
     constructor(authService: AuthorizationService) {
         this.authService = authService;
+        this.verify = this.verify.bind(this);
     }
 
     public async verify(req: Request, res: Response, next: NextFunction): Promise<void> {
