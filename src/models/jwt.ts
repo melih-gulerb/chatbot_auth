@@ -1,5 +1,4 @@
 export interface JwtPayload {
-    clientId: string
-    modelId: string
+    userId: string
     expireAt: string
 }

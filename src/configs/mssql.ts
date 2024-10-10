@@ -13,8 +13,8 @@ const sqlConfig: sql.config = {
         idleTimeoutMillis: 150000
     },
     options: {
-        encrypt: true, // Use encryption
-        trustServerCertificate: true, // For self-signed certificates
+        encrypt: true,
+        trustServerCertificate: true,
     },
 }
 
@@ -28,7 +28,7 @@ export async function getDBConnection(): Promise<sql.ConnectionPool> {
     try {
         pool = await sql.connect(sqlConfig)
         console.log('MSSQL connected successfully.')
-        keepConnectionAlive(pool)
+        keepConnectionAlive(pool);
         return pool
     } catch (error) {
         console.error('Error connecting to MSSQL:', error)
@@ -38,9 +38,8 @@ export async function getDBConnection(): Promise<sql.ConnectionPool> {
 
 async function keepConnectionAlive(pool: any) {
     let notBreak = true
-    while (notBreak) {  // Loop indefinitely for keep-alive
+    while (notBreak) {
         try {
-            // Wait for the connection pool to be available
             if (pool) {
                 await pool.request().query('SELECT 1');
                 console.log('Ping sent to Azure SQL to keep the connection alive.');
@@ -50,7 +49,6 @@ async function keepConnectionAlive(pool: any) {
             notBreak = false
         }
 
-        // Wait for a certain interval before sending the next ping
         await new Promise(resolve => setTimeout(resolve, 15 * 60 * 1000));  // Ping every 15 minutes
     }
 }

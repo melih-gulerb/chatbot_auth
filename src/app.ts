@@ -1,10 +1,13 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import { getDBConnection } from './configs/mssql'
-import { AuthService } from './services/authService'
-import { AuthController } from './controllers/authController'
+import { AuthorizationService } from './services/authorizationService'
 import {AuthRepository} from "./repositories/authRepository"
-import {errorHandler} from "./middlewares/errorHandling"
+import {AuthorizationController} from "./controllers/authorizationController";
+import {AuthenticationController} from "./controllers/authenticationController";
+import {AuthenticationService} from "./services/authenticationService";
+import {AuthorizationRoutes} from "./routes/authorizationRoutes";
+import {AuthenticationRoutes} from "./routes/authenticationRoutes";
 
 dotenv.config()
 
@@ -15,16 +18,15 @@ export async function initialize() {
     try {
         const mssqlConnection = await getDBConnection()
         const authRepository = AuthRepository.getInstance(mssqlConnection)
-        const authService = new AuthService(authRepository)
-        const authController = new AuthController(authService)
 
-        const router = express.Router()
+        const authorizationService = new AuthorizationService(authRepository)
+        const authorizationController = new AuthorizationController(authorizationService)
 
-        app.use('/auth', router)
-        router.post('', (req, res, next) => authController.createJWT(req, res, next))
-        router.post('/verify', (req, res, next) => authController.verifyJWT(req, res, next))
+        const authenticationService = new AuthenticationService(process.env.JWT_SECRET || '', '12h', authRepository)
+        const authenticationController = new AuthenticationController(authenticationService)
 
-        router.use(errorHandler)
+        new AuthorizationRoutes().InitRoutes(app, authorizationController)
+        new AuthenticationRoutes().InitRoutes(app, authenticationController)
 
         const PORT = 4040
         app.listen(PORT, () => {
