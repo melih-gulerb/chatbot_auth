@@ -1,7 +1,7 @@
 import sql, {ConnectionPool} from "mssql"
 import {BusinessError} from "../models/errors/base"
 import {v4 as uuidv4} from "uuid"
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import {User} from "../models/user";
 import {AuthQueries} from "./queries/authQueries";
 
